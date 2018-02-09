@@ -430,14 +430,17 @@ void parse_options_start(struct parse_opt_ctx_t *ctx,
  * many options that do not suppress it properly.
  */
 static int show_gitcomp(struct parse_opt_ctx_t *ctx,
-			const struct option *opts)
+			const struct option *opts,
+			const char *arg)
 {
 	for (; opts->type != OPTION_END; opts++) {
 		const char *suffix = "";
 
 		if (!opts->long_name)
 			continue;
-		if (opts->flags & (PARSE_OPT_HIDDEN | PARSE_OPT_NOCOMPLETE))
+		if (opts->flags & PARSE_OPT_HIDDEN)
+			continue;
+		if ((opts->flags & PARSE_OPT_NOCOMPLETE) && strcmp(arg, "all"))
 			continue;
 
 		switch (opts->type) {
@@ -498,8 +501,8 @@ int parse_options_step(struct parse_opt_ctx_t *ctx,
 			goto show_usage;
 
 		/* lone --git-completion-helper is asked by git-completion.bash */
-		if (ctx->total == 1 && !strcmp(arg + 1, "-git-completion-helper"))
-			return show_gitcomp(ctx, options);
+		if (ctx->total == 1 && skip_prefix(arg + 1, "-git-completion-helper=", &arg))
+			return show_gitcomp(ctx, options, arg);
 
 		if (arg[1] != '-') {
 			ctx->opt = arg + 1;

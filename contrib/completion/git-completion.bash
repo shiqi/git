@@ -36,6 +36,10 @@
 #
 #     When set to "1", do not include "DWIM" suggestions in git-checkout
 #     completion (e.g., completing "foo" when "origin/foo" exists).
+#
+#   GIT_COMPLETION_OPTIONS
+#
+#     When set to "all", complete all possible options
 
 case "$COMP_WORDBREAKS" in
 *:*) : great ;;
@@ -303,7 +307,7 @@ __gitcomp_builtin ()
 	if [ -z "$options" ]; then
 		# leading and trailing spaces are significant to make
 		# option removal work correctly.
-		options=" $(__git ${cmd/_/ } --git-completion-helper) $incl "
+		options=" $(__git ${cmd/_/ } --git-completion-helper=$GIT_COMPLETION_OPTIONS) $incl "
 		for i in $excl; do
 			options="${options/ $i / }"
 		done
