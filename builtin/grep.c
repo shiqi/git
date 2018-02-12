@@ -431,7 +431,9 @@ static int grep_submodule(struct grep_opt *opt, struct repository *superproject,
 	 * store is no longer global and instead is a member of the repository
 	 * object.
 	 */
+	grep_read_lock();
 	add_to_alternates_memory(submodule.objectdir);
+	grep_read_unlock();
 
 	if (oid) {
 		struct object *object;
@@ -1013,6 +1015,7 @@ int cmd_grep(int argc, const char **argv, const char *prefix)
 		       prefix, argv + i);
 	pathspec.max_depth = opt.max_depth;
 	pathspec.recursive = 1;
+	pathspec.recurse_submodules = !!recurse_submodules;
 
 #ifndef NO_PTHREADS
 	if (list.nr || cached || show_in_pager)
